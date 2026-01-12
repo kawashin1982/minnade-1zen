@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon みんなで応援 プログラム検索</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Amazon みんなで応援 プログラム検索</h1>
+        <p>地域や予算に合わせて、支援が必要な団体へ商品を贈ろう</p>
+    </header>
+
+    <main>
+        <div class="search-container">
+            <p>検索条件を入力してください</p>
+            <div class="search-box">
+                <select id="prefectureSelect">
+                    <option value="All">すべての地域</option>
+                    <!-- Options populated by JS -->
+                </select>
+                <select id="sortSelect">
+                    <option value="priceDesc">価格が高い順</option>
+                    <option value="priceAsc">価格が安い順</option>
+                </select>
+                <input type="number" id="budgetInput" placeholder="最大金額 (例: 3000)" min="0">
+                <button id="searchBtn">検索</button>
+            </div>
+        </div>
+
+        <div id="results">
+            <!-- Products will be inserted here -->
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
