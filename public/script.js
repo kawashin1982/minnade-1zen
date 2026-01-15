@@ -27,20 +27,59 @@ document.addEventListener('DOMContentLoaded', () => {
     const sortSelect = document.getElementById('sortSelect'); // NEW
 
     function populatePrefectures(data) {
-        const prefs = new Set();
+        const regionMapping = {
+            "北海道": ["北海道"],
+            "東北": ["青森", "岩手", "宮城", "秋田", "山形", "福島"],
+            "関東": ["茨城", "栃木", "群馬", "埼玉", "千葉", "東京", "神奈川"],
+            "中部": ["新潟", "富山", "石川", "福井", "山梨", "長野", "岐阜", "静岡", "愛知", "三重"],
+            "近畿": ["滋賀", "京都", "大阪", "兵庫", "奈良", "和歌山"],
+            "中国・四国": ["鳥取", "島根", "岡山", "広島", "山口", "徳島", "香川", "愛媛", "高知"],
+            "九州": ["福岡", "佐賀", "長崎", "熊本", "大分", "宮崎", "鹿児島", "沖縄"]
+        };
+
+        const availablePrefs = new Set();
         data.forEach(org => {
             if (org.prefecture) {
-                prefs.add(org.prefecture);
+                availablePrefs.add(org.prefecture);
             }
         });
 
-        const sortedPrefs = Array.from(prefs).sort();
-        sortedPrefs.forEach(pref => {
-            const option = document.createElement('option');
-            option.value = pref;
-            option.textContent = pref;
-            prefectureSelect.appendChild(option);
+        // Clear existing options except "All"
+        prefectureSelect.innerHTML = '<option value="All">すべての地域</option>';
+
+        Object.entries(regionMapping).forEach(([region, prefectures]) => {
+            const currentRegionPrefs = prefectures.filter(p => availablePrefs.has(p));
+
+            if (currentRegionPrefs.length > 0) {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = region;
+
+                currentRegionPrefs.forEach(pref => {
+                    const option = document.createElement('option');
+                    option.value = pref;
+                    option.textContent = pref;
+                    optgroup.appendChild(option);
+                });
+
+                prefectureSelect.appendChild(optgroup);
+            }
         });
+
+        // Add any prefectures not in the mapping (if any)
+        const mappedPrefs = new Set(Object.values(regionMapping).flat());
+        const otherPrefs = Array.from(availablePrefs).filter(p => !mappedPrefs.has(p)).sort();
+
+        if (otherPrefs.length > 0) {
+            const optgroup = document.createElement('optgroup');
+            optgroup.label = "その他";
+            otherPrefs.forEach(pref => {
+                const option = document.createElement('option');
+                option.value = pref;
+                option.textContent = pref;
+                optgroup.appendChild(option);
+            });
+            prefectureSelect.appendChild(optgroup);
+        }
     }
 
     searchBtn.addEventListener('click', () => {
