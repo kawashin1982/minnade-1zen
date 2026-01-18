@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon みんなで応援 プログラム検索</title>
+    <link rel="stylesheet" href="style.css?v=1.0.1">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Amazon みんなで応援 プログラム検索</h1>
+        <p>地域や予算に合わせて、支援が必要な団体へ商品を贈ろう</p>
+    </header>
+
+    <main>
+        <div class="intro-container">
+            <div class="intro-section">
+                <h2>どうして作った？</h2>
+                <p>Amazonの「みんなで応援」プログラムで寄付したいが、寄付しようと思っても想定額より高くて検索しなおしが多い→予算から逆引きできたらいいのにっ…！という思いから作りました。</p>
+            </div>
+            <div class="intro-section">
+                <h2>基本的な使い方</h2>
+                <ol class="usage-steps">
+                    <li>自分が出せそうな金額を入れて検索（都道府県別も選択できます）</li>
+                    <li>「Amazonで見る」を押す</li>
+                    <li>通常の買い物を進め、届け出先住所の中から施設名を選んで購入（別途送料がかかることも）</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="search-container">
+            <p>検索条件を入力してください</p>
+            <div class="search-box">
+                <select id="prefectureSelect">
+                    <option value="All">すべての地域</option>
+                    <!-- Options populated by JS -->
+                </select>
+                <select id="sortSelect">
+                    <option value="priceDesc">価格が高い順</option>
+                    <option value="priceAsc">価格が安い順</option>
+                </select>
+                <input type="number" id="budgetInput" placeholder="最大金額 (例: 3000)" min="0">
+                <button id="searchBtn">検索</button>
+            </div>
+        </div>
+
+        <div id="results">
+            <!-- Products will be inserted here -->
+        </div>
+    </main>
+
+    <script src="script.js?v=1.1.0"></script>
+</body>
+
+</html>
