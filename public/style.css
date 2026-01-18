@@ -8,6 +8,12 @@
     --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
@@ -33,6 +39,44 @@ main {
     max-width: 1200px;
     margin: 2rem auto;
     padding: 0 1rem;
+}
+
+.intro-container {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+}
+
+.intro-section {
+    margin-bottom: 2rem;
+}
+
+.intro-section:last-child {
+    margin-bottom: 0;
+}
+
+.intro-section h2 {
+    font-size: 1.25rem;
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--secondary-color);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    display: inline-block;
+}
+
+.intro-section p {
+    line-height: 1.6;
+}
+
+.usage-steps {
+    padding-left: 1.5rem;
+}
+
+.usage-steps li {
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
 }
 
 .search-container {
@@ -99,7 +143,8 @@ button:hover {
         padding: 0 10px;
     }
 
-    .search-container {
+    .search-container,
+    .intro-container {
         padding: 1rem;
     }
 
