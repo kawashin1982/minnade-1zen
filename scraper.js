@@ -66,10 +66,11 @@ const MAX_ORGS_PER_PREF = 3;
                             if (!parent) break;
                             const texts = parent.innerText.split('\n');
                             for (const line of texts) {
-                                if (line.includes('作成') || line.includes('by ') || line.includes('団体') || line.includes('NPO')) {
-                                    if (line !== name && line.length > 2 && line.length < 50) {
+                                // Enhanced keyword list for Japanese organizations
+                                if (line.match(/(作成|by\s|団体|NPO|法人|食堂|支援|クラブ|会|隊|センター|社団|財団|プロジェクト|ネットワーク|委員会|サポーター|塾|の家|園|スクール|協会|連盟)/)) {
+                                    if (line !== name && line.length > 1 && line.length < 60) {
                                         let clean = line.replace(/作成[:\s]*|by[:\s]*/g, '').trim();
-                                        if (clean.length > 2) {
+                                        if (clean.length > 1) {
                                             name = clean;
                                             foundAuthor = true;
                                             break;
@@ -81,7 +82,7 @@ const MAX_ORGS_PER_PREF = 3;
                             parent = parent.parentElement;
                         }
 
-                        const genericTerms = ['ほしい物リスト', '応援', 'Amazon', '支援', '作成', 'See More', '詳細'];
+                        const genericTerms = ['ほしい物リスト', '応援', 'Amazon', '支援', '作成', 'See More', '詳細', '買い物', '検索', 'ギフト'];
                         if (!foundAuthor && (name.length < 2 || genericTerms.some(t => name.includes(t)))) {
                             const img = a.querySelector('img');
                             if (img && img.alt && img.alt.length > 2) name = img.alt.trim();
@@ -92,7 +93,26 @@ const MAX_ORGS_PER_PREF = 3;
                     });
                 }, pref.name);
 
-                const uniqueOrgs = [...new Map(organizations.map(o => [o.url, o])).values()].slice(0, MAX_ORGS_PER_PREF);
+                // Smart Deduplication: Prefer entries with valid names
+                const orgMap = new Map();
+                organizations.forEach(o => {
+                    const existing = orgMap.get(o.url);
+                    const isUnknown = (n) => n === "名称不明の団体";
+
+                    if (!existing) {
+                        orgMap.set(o.url, o);
+                    } else {
+                        // If we have an existing entry but it's "Unknown", and the new one is KNOWN, replace it.
+                        if (isUnknown(existing.name) && !isUnknown(o.name)) {
+                            orgMap.set(o.url, o);
+                        }
+                        // If both are known (or both unknown), maybe prefer the longer name?
+                        else if (!isUnknown(existing.name) && !isUnknown(o.name)) {
+                            if (o.name.length > existing.name.length) orgMap.set(o.url, o);
+                        }
+                    }
+                });
+                const uniqueOrgs = [...orgMap.values()].slice(0, MAX_ORGS_PER_PREF);
                 console.log(`   Found ${uniqueOrgs.length} organizations in ${pref.name}.`);
 
                 for (const org of uniqueOrgs) {
@@ -139,7 +159,7 @@ const MAX_ORGS_PER_PREF = 3;
                                     if (!isNaN(price) && price > 0 && titleText.length > 0) {
                                         results.push({
                                             title: titleText,
-                                            link: titleEl.href,
+                                            link: titleEl.href.startsWith('http') ? titleEl.href : `https://www.amazon.co.jp${titleEl.href}`,
                                             image: imgSrc,
                                             price: price
                                         });
