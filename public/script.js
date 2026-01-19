@@ -158,7 +158,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <h3>${item.title}</h3>
                 <div class="org-name">
                     <span style="background:#eee; padding:2px 6px; border-radius:4px; font-size:0.8em; margin-right:5px;">${item.prefecture}</span>
-                    ${item.orgName}
+                    <a href="https://www.google.com/search?q=${encodeURIComponent(item.orgName)}" target="_blank" class="org-search-link" title="Googleで検索">
+                        ${item.orgName} <span style="font-size:0.8em">🔍</span>
+                    </a>
                 </div>
                 <div class="actions">
                     <a href="${item.link}" target="_blank" class="btn-amazon">Amazonで見る</a>

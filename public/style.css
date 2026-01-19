@@ -262,3 +262,16 @@ button:hover {
 .hidden {
     display: none;
 }
+
+/* Link to Google Search for Organization */
+.org-search-link {
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.2s;
+}
+
+.org-search-link:hover {
+    color: #007bff;
+    text-decoration: underline;
+}
