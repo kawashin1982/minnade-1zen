@@ -12,12 +12,12 @@ const MAX_ORGS_PER_PREF = 3;
     console.log('🚀 Starting Scraper (Debug Mode)...');
 
     const browser = await puppeteer.launch({
-        headless: "new",
+        headless: false, // Show browser to bypass simple bot checks
         args: ['--no-sandbox', '--disable-setuid-sandbox', '--lang=ja-JP']
     });
 
     const page = await browser.newPage();
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36');
 
     let allData = [];
 
@@ -53,7 +53,28 @@ const MAX_ORGS_PER_PREF = 3;
             console.log(`📂 Processing: ${pref.name}`);
             try {
                 await page.goto(pref.url, { waitUntil: 'domcontentloaded', timeout: 30000 });
-                await page.waitForSelector('body');
+                try {
+                    await page.waitForSelector('a[href*="/hz/wishlist/ls/"]', { timeout: 10000 });
+                } catch (e) {
+                    console.log('⚠️ Timeout waiting for wishlist selectors. Page might be empty or loading slowly.');
+                }
+
+                // Auto-scroll to trigger lazy loading
+                await page.evaluate(async () => {
+                    await new Promise((resolve) => {
+                        let totalHeight = 0;
+                        const distance = 100;
+                        const timer = setInterval(() => {
+                            const scrollHeight = document.body.scrollHeight;
+                            window.scrollBy(0, distance);
+                            totalHeight += distance;
+                            if (totalHeight >= scrollHeight || totalHeight > 5000) { // Scan top part
+                                clearInterval(timer);
+                                resolve();
+                            }
+                        }, 100);
+                    });
+                });
 
                 const organizations = await page.evaluate((prefName) => {
                     const links = Array.from(document.querySelectorAll('a[href*="/hz/wishlist/ls/"]'));
@@ -197,7 +218,11 @@ const MAX_ORGS_PER_PREF = 3;
         console.error('Fatal:', e);
     } finally {
         await browser.close();
-        fs.writeFileSync(OUTPUT_FILE, JSON.stringify(allData, null, 2));
-        console.log(`✅ Data Saved. Items collected: ${allData.length} organizations.`);
+        if (allData.length > 0) {
+            fs.writeFileSync(OUTPUT_FILE, JSON.stringify(allData, null, 2));
+            console.log(`✅ Data Saved. Items collected: ${allData.length} organizations.`);
+        } else {
+            console.error('⚠️ No data collected. Skipping file write to preserve existing data.');
+        }
     }
 })();
