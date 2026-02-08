@@ -12,7 +12,7 @@ const MAX_ORGS_PER_PREF = 3;
     console.log('🚀 Starting Scraper (Debug Mode)...');
 
     const browser = await puppeteer.launch({
-        headless: false, // Show browser to bypass simple bot checks
+        headless: "new", // Must be headless for GitHub Actions
         args: ['--no-sandbox', '--disable-setuid-sandbox', '--lang=ja-JP']
     });
 
