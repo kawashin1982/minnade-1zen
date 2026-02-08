@@ -7,21 +7,54 @@ document.addEventListener('DOMContentLoaded', () => {
     let allData = [];
 
     // Fetch data on load
+    // Check for file protocol
+    if (window.location.protocol === 'file:') {
+        resultsContainer.innerHTML = `
+            <div class="error-message">
+                <p>⚠️ <strong>注意: ローカルファイルとして開いています</strong></p>
+                <p>セキュリティ上の制限により、このままではデータ(data.json)を読み込めない可能性が高いです。</p>
+                <p>以下のいずれかの方法でご利用ください：</p>
+                <ul>
+                    <li>ローカルサーバーを使用する (例: <code>npx http-server public</code>)</li>
+                    <li>GitHub Pagesなどにアップロードして確認する</li>
+                    <li>(開発者向け) ブラウザのセキュリティ設定を一時的に無効にする</li>
+                </ul>
+            </div>
+        `;
+        // Attempt fetch anyway, but don't be surprised if it fails
+    }
+
+    // Fetch data on load
     fetch('data.json')
         .then(response => {
             if (!response.ok) {
-                throw new Error('Data file not found or invalid');
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
             return response.json();
         })
         .then(data => {
             allData = data;
             console.log('Data loaded:', allData.length, 'organizations found');
+
+            if (!allData || allData.length === 0) {
+                resultsContainer.innerHTML = '<p class="loading">データが見つかりませんでした (0件)。<br>管理者に連絡するか、しばらく待ってから再読み込みしてください。</p>';
+                return;
+            }
+
             populatePrefectures(data);
         })
         .catch(err => {
-            console.error(err);
-            resultsContainer.innerHTML = '<p class="loading">データの読み込みに失敗しました。<br>管理者にお問い合わせください (data.json missing)。</p>';
+            console.error('Data Load Error:', err);
+
+            let errorMsg = 'データの読み込みに失敗しました。';
+            if (window.location.protocol === 'file:') {
+                errorMsg += '<br>ローカルファイル(file://)では動作しない可能性があります。';
+            } else {
+                errorMsg += '<br>管理者にお問い合わせください (data.json missing or invalid)。';
+            }
+            errorMsg += `<br><span style="font-size:0.8em; color:#666;">詳細: ${err.message}</span>`;
+
+            resultsContainer.innerHTML = `<p class="loading error">${errorMsg}</p>`;
         });
 
     const sortSelect = document.getElementById('sortSelect'); // NEW
